@@ -27,12 +27,8 @@ def buycrypto():
 
 def writetofile(orders):
 
-    btcno = orders[0]
-    ltcno = orders[1]
-    ethno = orders[2]
-
     # Bitcoin Details
-    btcdets = auth_client.get_order(btcno)  # Uses the order ID to get extra, specific details of transaction
+    btcdets = auth_client.get_order(orders[0])  # Uses the order ID to get extra, specific details of transaction
 
     try:
         msg = "Date & Time:\t" + btcdets["created_at"] + "\tGross Spent:\t" + btcdets["specified_funds"] \
@@ -46,7 +42,7 @@ def writetofile(orders):
     f.close()
 
     # Litecoin Details
-    ltcdets = auth_client.get_order(ltcno)
+    ltcdets = auth_client.get_order(orders[1])
 
     try:
         msg = "Date & Time:\t" + ltcdets["created_at"] + "\tGross Spent:\t" + ltcdets["specified_funds"] \
@@ -60,7 +56,7 @@ def writetofile(orders):
     f.close()
 
     # Ethereum Details
-    ethdets = auth_client.get_order(ethno)
+    ethdets = auth_client.get_order(orders[2])
 
     try:
         msg = "Date & Time:\t" + ethdets["created_at"] + "\tGross Spent:\t" + ethdets["specified_funds"] \
