@@ -54,8 +54,6 @@ eth_order = auth_client.buy(order_type="market",
                             product_id='ETH-EUR',
                             funds="45")
 
-# At time of writing this program, Coinbase doesnt seem to be sending a message back when Ethereum is bought!
-"""
 orderdets = auth_client.get_order(eth_order["id"])
 
 try:
@@ -68,4 +66,3 @@ except:
 f = open(os.environ.get("CoinbaseDirectory") + "eth.txt", "a")
 f.write(msg + "\n")
 f.close()
-"""
