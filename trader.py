@@ -43,7 +43,7 @@ def writetofile(orders):
     ltcdets = auth_client.get_order(orders[1])
 
     try:
-        msg = "Litecoin\t - Date & Time:" + ltcdets["created_at"] + " - Gross Spent:" + ltcdets["specified_funds"] \
+        msg = "Litecoin - Date & Time:" + ltcdets["created_at"] + " - Gross Spent:" + ltcdets["specified_funds"] \
               + " - Fees:" + ltcdets["fill_fees"] + " - Net Spent:" + ltcdets["funds"] + \
               " - Amount Bought:" + ltcdets["filled_size"]
     except:
@@ -55,7 +55,7 @@ def writetofile(orders):
     ethdets = auth_client.get_order(orders[2])
 
     try:
-        msg = "Ethereum\t - Date & Time:" + ethdets["created_at"] + " - Gross Spent:" + ethdets["specified_funds"] \
+        msg = "Ethereum - Date & Time:" + ethdets["created_at"] + " - Gross Spent:" + ethdets["specified_funds"] \
               + " - Fees:" + ethdets["fill_fees"] + " - Net Spent:" + ethdets["funds"] + \
               " - Amount Bought:" + ethdets["filled_size"]
     except:
