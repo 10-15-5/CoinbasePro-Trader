@@ -86,5 +86,5 @@ auth_client = cbpro.AuthenticatedClient(os.environ.get("CoinbasePro_API_Public")
                                         os.environ.get("CoinbasePro_Passphrase"))
 
 orders = buycrypto()
-time.sleep(10)
+time.sleep(10)      # Wait 10 seconds for CB to catch up and log the transaction
 writetofile(orders)
