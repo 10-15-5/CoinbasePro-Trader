@@ -1,6 +1,7 @@
 import cbpro
 import os
 import logging
+import time
 
 
 def buycrypto():
@@ -30,7 +31,7 @@ def writetofile(orders):
     btcdets = auth_client.get_order(orders[0])  # Uses the order ID to get extra, specific details of transaction
 
     try:
-        msg = "\u20BFitcoin - Date & Time:" + btcdets["created_at"] + " - Gross Spent:" + btcdets["specified_funds"] \
+        msg = "\u20BFitcoin\t - Date & Time:" + btcdets["created_at"] + " - Gross Spent:" + btcdets["specified_funds"] \
               + " - Fees:" + btcdets["fill_fees"] + " - Net Spent:" + btcdets["funds"] + \
               " - Amount Bought:" + btcdets["filled_size"]
     except:
@@ -42,7 +43,7 @@ def writetofile(orders):
     ltcdets = auth_client.get_order(orders[1])
 
     try:
-        msg = "Litecoin - Date & Time:" + ltcdets["created_at"] + " - Gross Spent:" + ltcdets["specified_funds"] \
+        msg = "Litecoin\t - Date & Time:" + ltcdets["created_at"] + " - Gross Spent:" + ltcdets["specified_funds"] \
               + " - Fees:" + ltcdets["fill_fees"] + " - Net Spent:" + ltcdets["funds"] + \
               " - Amount Bought:" + ltcdets["filled_size"]
     except:
@@ -54,7 +55,7 @@ def writetofile(orders):
     ethdets = auth_client.get_order(orders[2])
 
     try:
-        msg = "Ethereum - Date & Time:" + ethdets["created_at"] + " - Gross Spent:" + ethdets["specified_funds"] \
+        msg = "Ethereum\t - Date & Time:" + ethdets["created_at"] + " - Gross Spent:" + ethdets["specified_funds"] \
               + " - Fees:" + ethdets["fill_fees"] + " - Net Spent:" + ethdets["funds"] + \
               " - Amount Bought:" + ethdets["filled_size"]
     except:
@@ -85,4 +86,5 @@ auth_client = cbpro.AuthenticatedClient(os.environ.get("CoinbasePro_API_Public")
                                         os.environ.get("CoinbasePro_Passphrase"))
 
 orders = buycrypto()
+time.sleep(10)
 writetofile(orders)
