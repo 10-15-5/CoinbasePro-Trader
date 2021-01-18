@@ -7,23 +7,29 @@ import time
 def buycrypto():
     btc_order = auth_client.buy(order_type="market",
                                 product_id='BTC-EUR',
-                                funds="10")  # Amount you want to buy
+                                funds="90")  # Amount you want to buy
 
     btc_orderid = btc_order["id"]  # Uses the order ID to get extra, specific details of transaction
 
     ltc_order = auth_client.buy(order_type="market",
                                 product_id='LTC-EUR',
-                                funds="10")
+                                funds="15")
 
     ltc_orderid = ltc_order["id"]
 
     eth_order = auth_client.buy(order_type="market",
                                 product_id='ETH-EUR',
-                                funds="10")
+                                funds="45")
 
     eth_orderid = eth_order["id"]
 
-    return btc_orderid, ltc_orderid, eth_orderid
+    link_order = auth_client.buy(order_type="market",
+                                 product_id='LINK-EUR',
+                                 funds="10")
+
+    link_orderid = link_order["id"]
+
+    return btc_orderid, ltc_orderid, eth_orderid, link_orderid
 
 
 def writetofile(orders):
@@ -63,6 +69,18 @@ def writetofile(orders):
 
     logger.info(msg)
 
+    # Chainlink Details
+    linkdets = auth_client.get_order(orders[3])
+
+    try:
+        msg = "Ethereum - Date & Time:" + linkdets["created_at"] + " - Gross Spent:" + linkdets["specified_funds"] \
+              + " - Fees:" + linkdets["fill_fees"] + " - Net Spent:" + linkdets["funds"] + \
+              " - Amount Bought:" + linkdets["filled_size"]
+    except:
+        msg = "Error printing Ethereum details"
+
+    logger.info(msg)
+
 
 # ------------------------------------------------------------------
 #   Logging Setup
@@ -86,5 +104,5 @@ auth_client = cbpro.AuthenticatedClient(os.environ.get("CoinbasePro_API_Public")
                                         os.environ.get("CoinbasePro_Passphrase"))
 
 orders = buycrypto()
-time.sleep(10)      # Wait 10 seconds for CB to catch up and log the transaction
+time.sleep(10)  # Wait 10 seconds for CB to catch up and log the transaction
 writetofile(orders)
