@@ -4,6 +4,29 @@ import logging
 import time
 import requests
 
+# ------------------------------------------------------------------
+#   Logging Setup
+# ------------------------------------------------------------------
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+formatter = logging.Formatter('%(message)s')
+
+file_handler = logging.FileHandler(os.environ.get("CoinbaseDirectory") + "CoinbasePro-Trader.log", encoding='utf8')
+file_handler.setFormatter(formatter)
+
+logger.addHandler(file_handler)
+
+# ------------------------------------------------------------------
+
+# Global variables
+auth_client = cbpro.AuthenticatedClient(os.environ.get("CoinbasePro_API_Public"),
+                                        os.environ.get("CoinbasePro_API_Secret"),
+                                        os.environ.get("CoinbasePro_Passphrase"))
+bot_token = os.environ.get("CryptoTrackerBotToken")
+chatid = os.environ.get("TelegramChatID")
+
 
 def buycrypto():
     btc_order = auth_client.buy(order_type="market",
@@ -33,10 +56,10 @@ def buycrypto():
     return btc_orderid, ltc_orderid, eth_orderid, link_orderid
 
 
-def sendmsg(orders, chatid, bot_token):
-    # Bitcoin Details
-    btcdets = auth_client.get_order(orders[0])  # Uses the order ID to get extra, specific details of transaction
-
+def writetolog(btcdets, ltcdets, ethdets, linkdets):
+    #######################################################
+    # Bitcoin Log
+    #######################################################
     try:
         msg = f'\u20BFitcoin - Date & Time:{btcdets["created_at"]} - Gross Spent: {btcdets["specified_funds"]}' \
               f' - Fees: {btcdets["fill_fees"]} - Net Spent: {btcdets["funds"]}' \
@@ -46,14 +69,9 @@ def sendmsg(orders, chatid, bot_token):
 
     logger.info(msg)
 
-    url = f"https://api.telegram.org/bot{bot_token}/sendMessage?chat_id={chatid}&text={msg}"
-
-    # send the msg
-    requests.get(url)
-
-    # Litecoin Details
-    ltcdets = auth_client.get_order(orders[1])
-
+    #####################################################
+    # Litecoin Log
+    #####################################################
     try:
         msg = f'Litecoin - Date & Time:{ltcdets["created_at"]} - Gross Spent: {ltcdets["specified_funds"]}' \
               f' - Fees: {ltcdets["fill_fees"]} - Net Spent: {ltcdets["funds"]}' \
@@ -63,14 +81,9 @@ def sendmsg(orders, chatid, bot_token):
 
     logger.info(msg)
 
-    url = f"https://api.telegram.org/bot{bot_token}/sendMessage?chat_id={chatid}&text={msg}"
-
-    # send the msg
-    requests.get(url)
-
-    # Ethereum Details
-    ethdets = auth_client.get_order(orders[2])
-
+    ####################################################
+    # Ethereum Log
+    ####################################################
     try:
         msg = f'Ethereum - Date & Time:{ethdets["created_at"]} - Gross Spent: {ethdets["specified_funds"]}' \
               f' - Fees: {ethdets["fill_fees"]} - Net Spent: {ethdets["funds"]}' \
@@ -80,14 +93,9 @@ def sendmsg(orders, chatid, bot_token):
 
     logger.info(msg)
 
-    url = f"https://api.telegram.org/bot{bot_token}/sendMessage?chat_id={chatid}&text={msg}"
-
-    # send the msg
-    requests.get(url)
-
-    # Chainlink Details
-    linkdets = auth_client.get_order(orders[3])
-
+    ###################################################
+    # Chainlink Log
+    ###################################################
     try:
         msg = f'Chainlink - Date & Time:{linkdets["created_at"]} - Gross Spent: {linkdets["specified_funds"]}' \
               f' - Fees: {linkdets["fill_fees"]} - Net Spent: {linkdets["funds"]}' \
@@ -97,36 +105,34 @@ def sendmsg(orders, chatid, bot_token):
 
     logger.info(msg)
 
+
+def sendmsg(btcdets, ltcdets, ethdets, linkdets):
+
+    msg = f'Here is your weekly crypto update:' \
+        f'\nYou bought {btcdets["filled_size"]} \u20BFitcoin for €{btcdets["specified_funds"]: .2f}' \
+        f'\nYou bought {ltcdets["filled_size"]} Litecoin for €{ltcdets["specified_funds"]: .2f}' \
+        f'\nYou bought {ethdets["filled_size"]} Ethereum for €{ethdets["specified_funds"]: .2f}' \
+        f'\nYou bought {linkdets["filled_size"]} Chainlink for €{linkdets["specified_funds"]: .2f}'
+
     url = f"https://api.telegram.org/bot{bot_token}/sendMessage?chat_id={chatid}&text={msg}"
 
     # send the msg
     requests.get(url)
 
 
-# ------------------------------------------------------------------
-#   Logging Setup
-# ------------------------------------------------------------------
+def main():
+    orders = buycrypto()
+    time.sleep(10)  # Wait 10 seconds for CB to catch up and log the transaction
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+    btcdets = auth_client.get_order(orders[0])  # Uses the order ID to get extra, specific details of transaction
+    ltcdets = auth_client.get_order(orders[1])
+    ethdets = auth_client.get_order(orders[2])
+    linkdets = auth_client.get_order(orders[3])
 
-formatter = logging.Formatter('%(message)s')
+    writetolog(btcdets, ltcdets, ethdets, linkdets)
 
-file_handler = logging.FileHandler(os.environ.get("CoinbaseDirectory") + "CoinbasePro-Trader.log", encoding='utf8')
-file_handler.setFormatter(formatter)
-
-logger.addHandler(file_handler)
-
-# ------------------------------------------------------------------
+    sendmsg(btcdets, ltcdets, ethdets, linkdets)
 
 
-auth_client = cbpro.AuthenticatedClient(os.environ.get("CoinbasePro_API_Public"),
-                                        os.environ.get("CoinbasePro_API_Secret"),
-                                        os.environ.get("CoinbasePro_Passphrase"))
-
-bot_token = os.environ.get("CryptoTrackerBotToken")
-chatid = os.environ.get("TelegramChatID")
-
-orders = buycrypto()
-time.sleep(10)  # Wait 10 seconds for CB to catch up and log the transaction
-sendmsg(orders, chatid, bot_token)
+if __name__ == '__main__':
+    main()
