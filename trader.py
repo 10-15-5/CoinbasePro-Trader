@@ -108,11 +108,14 @@ def writetolog(btcdets, ltcdets, ethdets, linkdets):
 
 def sendmsg(btcdets, ltcdets, ethdets, linkdets):
 
-    msg = f'Here is your weekly crypto update:' \
-        f'\nYou bought {btcdets["filled_size"]} \u20BFitcoin for €{btcdets["specified_funds"]: .2f}' \
-        f'\nYou bought {ltcdets["filled_size"]} Litecoin for €{ltcdets["specified_funds"]: .2f}' \
-        f'\nYou bought {ethdets["filled_size"]} Ethereum for €{ethdets["specified_funds"]: .2f}' \
-        f'\nYou bought {linkdets["filled_size"]} Chainlink for €{linkdets["specified_funds"]: .2f}'
+    try:
+        msg = f'Here is your weekly crypto update:' \
+            f'\nYou bought {btcdets["filled_size"]} \u20BFitcoin for €{float(btcdets["specified_funds"]): .2f}' \
+            f'\nYou bought {ltcdets["filled_size"]} Litecoin for €{float(ltcdets["specified_funds"]): .2f}' \
+            f'\nYou bought {ethdets["filled_size"]} Ethereum for €{float(ethdets["specified_funds"]): .2f}' \
+            f'\nYou bought {linkdets["filled_size"]} Chainlink for €{float(linkdets["specified_funds"]): .2f}'
+    except:
+        msg = f'You bought some crypto but for some reason the messaging part of it fucked up!'
 
     url = f"https://api.telegram.org/bot{bot_token}/sendMessage?chat_id={chatid}&text={msg}"
 
