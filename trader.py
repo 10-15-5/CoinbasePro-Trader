@@ -13,7 +13,7 @@ logger.setLevel(logging.INFO)
 
 formatter = logging.Formatter('%(message)s')
 
-file_handler = logging.FileHandler(os.environ.get("CoinbaseDirectory") + "CoinbasePro-Trader.log", encoding='utf8')
+file_handler = logging.FileHandler("C:\\Users\\[Insert Username Here]\\CoinbasePro-Trader.log", encoding='utf8')
 file_handler.setFormatter(formatter)
 
 logger.addHandler(file_handler)
@@ -21,35 +21,35 @@ logger.addHandler(file_handler)
 # ------------------------------------------------------------------
 
 # Global variables
-auth_client = cbpro.AuthenticatedClient(os.environ.get("CoinbasePro_API_Public"),
-                                        os.environ.get("CoinbasePro_API_Secret"),
-                                        os.environ.get("CoinbasePro_Passphrase"))
-bot_token = os.environ.get("CryptoTrackerBotToken")
-chatid = os.environ.get("TelegramChatID")
+auth_client = cbpro.AuthenticatedClient("Insert Public API Key Here",
+                                        "Insert Private API Key Here",
+                                        "Insert API Passphrase Here")
+bot_token = "1594295411:AAE5hoqjmN7TdqPTnnwzZAOH2OlO0-z6T4E"    # My bot token, feel free to use it or add your own
+chatid = "Add your Telegram Chat ID here"
 
 
 def buycrypto():
     btc_order = auth_client.buy(order_type="market",
                                 product_id='BTC-EUR',
-                                funds="90")  # Amount you want to buy
+                                funds="Money")  # Amount you want to buy
 
     btc_orderid = btc_order["id"]  # Uses the order ID to get extra, specific details of transaction
 
     ltc_order = auth_client.buy(order_type="market",
                                 product_id='LTC-EUR',
-                                funds="15")
+                                funds="Money")
 
     ltc_orderid = ltc_order["id"]
 
     eth_order = auth_client.buy(order_type="market",
                                 product_id='ETH-EUR',
-                                funds="45")
+                                funds="Money")
 
     eth_orderid = eth_order["id"]
 
     link_order = auth_client.buy(order_type="market",
                                  product_id='LINK-EUR',
-                                 funds="10")
+                                 funds="Money")
 
     link_orderid = link_order["id"]
 
