@@ -7,12 +7,16 @@ price.
 
 Uses the cbpro python client to interact with the Coinbase API.
 
-To setup the program go into settings/config and change the API codes, the Telegram codes and the Currency you want to use.
-After that the program will ask you what crypto you want to buy and how much you want to spend and these will be saved to a txt file in settings.
+##Getting Started
+
+1) To set up the program go into settings/config and change the API codes, the Telegram codes, 
+   and the Currency you want to use.
+2) After that the program will ask you what crypto you want to buy and how much you want to spend, 
+   and these will be saved to a txt file in settings.
 
 ***You need to have funds in your CoinbasePro account for this program to work***
 
-*NB This program is not perfect and there may be a few bugs in it, just let me know if you find anything and
+*NB This program is not perfect and there may be a few bugs in it, just let me know if you find anything, and
 I will try to fix it ASAP.*
 
 *Some of this program does need to be changed to be more efficient, or to just use less code, I will be doing 
