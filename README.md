@@ -7,19 +7,8 @@ price.
 
 Uses the cbpro python client to interact with the Coinbase API.
 
-If someone wants to use this program they will have to change:
-* The three CoinbasePro API keys, Public, Secret and Passphrase
-* The token for the Telegram bot they have set up, you can use my Telegram bot that I have set up although there
-is nothing special about it.
-* Their Telegram chat ID, without this the Telegram bot won't know where to send the transaction details.  
-* You will also have to swap in your username in the directory for logging setup, it's auto set to the main C
-Drive
-* Finally, update the amount of each crypto you want to buy. 
-  
-To add a transaction for a crypto just copy-paste one of the existing crypto setups and just change the variable
-names to the new one you want.
-
-To remove a transaction just comment out/delete all instances of the transaction you want.
+To setup the program go into settings/config and change the API codes, the Telegram codes and the Currency you want to use.
+After that the program will ask you what crypto you want to buy and how much you want to spend and these will be saved to a txt file in settings.
 
 ***You need to have funds in your CoinbasePro account for this program to work***
 
