@@ -3,6 +3,8 @@ import os
 import logging
 import time
 import requests
+import configparser
+import sys
 
 # ------------------------------------------------------------------
 #   Logging Setup
@@ -13,128 +15,121 @@ logger.setLevel(logging.INFO)
 
 formatter = logging.Formatter('%(message)s')
 
-file_handler = logging.FileHandler("C:\\Users\\[Insert Username Here]\\CoinbasePro-Trader.log", encoding='utf8')
+file_handler = logging.FileHandler("settings\\logs.log", encoding='utf8')
 file_handler.setFormatter(formatter)
 
 logger.addHandler(file_handler)
 
 # ------------------------------------------------------------------
 
+config = configparser.RawConfigParser()
+configFilePath = r"settings/config.txt"
+config.read(configFilePath, encoding="utf-8")
+
+
 # Global variables
-auth_client = cbpro.AuthenticatedClient("Insert Public API Key Here",
-                                        "Insert Private API Key Here",
-                                        "Insert API Passphrase Here")
-bot_token = "1594295411:AAE5hoqjmN7TdqPTnnwzZAOH2OlO0-z6T4E"    # My bot token, feel free to use it or add your own
-chatid = "Add your Telegram Chat ID here"
+auth_client = cbpro.AuthenticatedClient(config.get("CONFIG", "CB_PRO_PUBLIC"),
+                                        config.get("CONFIG", "CB_PRO_PRIVATE"),
+                                        config.get("CONFIG", "CB_PRO_PASSPHRASE")
+                                        )
+public_client = cbpro.PublicClient()
 
 
-def buycrypto():
-    btc_order = auth_client.buy(order_type="market",
-                                product_id='BTC-EUR',
-                                funds="Money")  # Amount you want to buy
+def getcoins():
+    print("Please enter the symbol of the coins you want to buy (if buying multiple, seperate them with commas):")
+    coins = input().upper()
+    coins = coins.replace(" ", "")
+    coins = coins.split(",")
+    for i in range(len(coins)):
+        # Check to see if coin can be bought on CoinbasePro
+        pair = coins[i] + "-" + config.get("CONFIG", "CURRENCY")
+        response = public_client.get_product_order_book(pair)
 
-    btc_orderid = btc_order["id"]  # Uses the order ID to get extra, specific details of transaction
+        if "message" in response:
+            print(pair + " is an invalid trading pair for CoinbasePro, please re-run the program and try again")
+            sys.exit()
 
-    ltc_order = auth_client.buy(order_type="market",
-                                product_id='LTC-EUR',
-                                funds="Money")
-
-    ltc_orderid = ltc_order["id"]
-
-    eth_order = auth_client.buy(order_type="market",
-                                product_id='ETH-EUR',
-                                funds="Money")
-
-    eth_orderid = eth_order["id"]
-
-    link_order = auth_client.buy(order_type="market",
-                                 product_id='LINK-EUR',
-                                 funds="Money")
-
-    link_orderid = link_order["id"]
-
-    return btc_orderid, ltc_orderid, eth_orderid, link_orderid
+    getpurchaseamount(coins)
 
 
-def writetolog(btcdets, ltcdets, ethdets, linkdets):
-    #######################################################
-    # Bitcoin Log
-    #######################################################
+def getpurchaseamount(coins):
+    amount = []
+    print("How much do you want to spend? (Minimum amount per transaction is €10)")
+    for i in range(len(coins)):
+        spend = input(coins[i] + ":\t€")
+        try:
+            spend = float(spend)
+            amount.append(str(spend))
+            if spend < 10:
+                print("Has to be more than 10, Try again!")
+                sys.exit()
+        except ValueError:
+            print("Please only enter digits, Try again!")
+            sys.exit()
+
+    with open("settings/coins.txt", "w") as file:
+        for i in range(len(coins)):
+            value_to_write = f'{coins[i]},{amount[i]}\n'
+            file.write(value_to_write)
+
+
+def buycrypto(specs):
+
+    order = auth_client.buy(order_type="market",
+                            product_id=specs["coin"] + "-" + config.get("CONFIG", "CURRENCY"),
+                            funds=specs["amount"])  # Amount you want to buy
+
+    order_id = order["id"]  # Uses the order ID to get specific details of transaction
+
+    return order_id
+
+
+def writetolog(dets):
     try:
-        msg = f'\u20BFitcoin - Date & Time:{btcdets["created_at"]} - Gross Spent: {btcdets["specified_funds"]}' \
-              f' - Fees: {btcdets["fill_fees"]} - Net Spent: {btcdets["funds"]}' \
-              f' - Amount Bought: {btcdets["filled_size"]}'
+        msg = f'{dets["product_id"]} - Date & Time:{dets["created_at"]} - Gross Spent: {dets["specified_funds"]}' \
+              f' - Fees: {dets["fill_fees"]} - Net Spent: {dets["funds"]}' \
+              f' - Amount Bought: {dets["filled_size"]}'
     except:
-        msg = "Error getting \u20BFitcoin details"  # Don't want to break the whole program so it prints this instead
-
-    logger.info(msg)
-
-    #####################################################
-    # Litecoin Log
-    #####################################################
-    try:
-        msg = f'Litecoin - Date & Time:{ltcdets["created_at"]} - Gross Spent: {ltcdets["specified_funds"]}' \
-              f' - Fees: {ltcdets["fill_fees"]} - Net Spent: {ltcdets["funds"]}' \
-              f' - Amount Bought: {ltcdets["filled_size"]}'
-    except:
-        msg = "Error getting Litecoin details"
-
-    logger.info(msg)
-
-    ####################################################
-    # Ethereum Log
-    ####################################################
-    try:
-        msg = f'Ethereum - Date & Time:{ethdets["created_at"]} - Gross Spent: {ethdets["specified_funds"]}' \
-              f' - Fees: {ethdets["fill_fees"]} - Net Spent: {ethdets["funds"]}' \
-              f' - Amount Bought: {ethdets["filled_size"]}'
-    except:
-        msg = "Error getting Ethereum details"
-
-    logger.info(msg)
-
-    ###################################################
-    # Chainlink Log
-    ###################################################
-    try:
-        msg = f'Chainlink - Date & Time:{linkdets["created_at"]} - Gross Spent: {linkdets["specified_funds"]}' \
-              f' - Fees: {linkdets["fill_fees"]} - Net Spent: {linkdets["funds"]}' \
-              f' - Amount Bought: {linkdets["filled_size"]}'
-    except:
-        msg = "Error getting Ethereum details"
+        msg = "Error getting order details"  # Don't want to break the whole program so it prints this instead
 
     logger.info(msg)
 
 
-def sendmsg(btcdets, ltcdets, ethdets, linkdets):
-
+def sendmsg(order_details):
     try:
-        msg = f'Here is your weekly crypto update:' \
-            f'\nYou bought {btcdets["filled_size"]} \u20BFitcoin for €{float(btcdets["specified_funds"]): .2f}' \
-            f'\nYou bought {ltcdets["filled_size"]} Litecoin for €{float(ltcdets["specified_funds"]): .2f}' \
-            f'\nYou bought {ethdets["filled_size"]} Ethereum for €{float(ethdets["specified_funds"]): .2f}' \
-            f'\nYou bought {linkdets["filled_size"]} Chainlink for €{float(linkdets["specified_funds"]): .2f}'
+        msg = f'{order_details["Product"]} - You got {order_details["filled_size"]} for ' \
+              f'€{float(order_details["specified_funds"]): .2f}'
     except:
         msg = f'You bought some crypto but for some reason the messaging part of it fucked up!'
 
-    url = f"https://api.telegram.org/bot{bot_token}/sendMessage?chat_id={chatid}&text={msg}"
+    url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=" \
+          f"{settings.TELEGRAM_CHAT_ID}&text={msg}"
 
     # send the msg
     requests.get(url)
 
 
 def main():
-    orders = buycrypto()
-    time.sleep(10)  # Wait 10 seconds for CB to catch up and log the transaction
+    if not os.path.isfile("settings/coins.txt"):
+        getcoins()
 
-    btcdets = auth_client.get_order(orders[0])  # Uses the order ID to get extra, specific details of transaction
-    ltcdets = auth_client.get_order(orders[1])
-    ethdets = auth_client.get_order(orders[2])
-    linkdets = auth_client.get_order(orders[3])
+    order_ids = []
+    with open("settings/coins.txt", "r") as coins:
+        coin_and_amount = coins.read().splitlines()
+        for i in range(len(coin_and_amount)):
+            split = coin_and_amount[i].split(",")
+            specs = {"coin": split[0], "amount": split[1]}
+            order_ids.append(buycrypto(specs))
 
-    writetolog(btcdets, ltcdets, ethdets, linkdets)
+    time.sleep(10)  # Wait 10 seconds for CB to catch up and log all the transactions
 
-    sendmsg(btcdets, ltcdets, ethdets, linkdets)
+    for i in range(len(order_ids)):
+        # Uses the order ID to get specific details of transaction
+        dets = auth_client.get_order(order_ids[i])
+        writetolog(dets)
+        telegram_details = {"Product": dets["product_id"], "Filled Size": dets["filled_size"],
+                            "Spent": ["specified_funds"]}
+        sendmsg(telegram_details)
 
 
 if __name__ == '__main__':
