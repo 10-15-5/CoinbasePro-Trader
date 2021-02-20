@@ -1,10 +1,13 @@
+**Fill out below with your details, no need to put the deials inside quotes**
+eg. CB_PRO_PUBLIC = 5f1c5f6s...
+
 [CONFIG]
-CB_PRO_PUBLIC = "Insert Public API Key Here"
-CB_PRO_PRIVATE = "Insert Private API Key Here"
-CB_PRO_PASSPHRASE = "Insert API Passphrase Here"
+CB_PRO_PUBLIC =
+CB_PRO_PRIVATE =
+CB_PRO_PASSPHRASE =
 
 # My bot token, feel free to use it or add your own
-TELEGRAM_BOT_TOKEN = "1594295411:AAE5hoqjmN7TdqPTnnwzZAOH2OlO0-z6T4E"
-TELEGRAM_CHAT_ID = "Add your Telegram Chat ID here"
+TELEGRAM_BOT_TOKEN = 1594295411:AAE5hoqjmN7TdqPTnnwzZAOH2OlO0-z6T4E
+TELEGRAM_CHAT_ID =
 
-CURRENCY = "Enter the currency you want to use here, please use currency codes: EUR, USD"
+CURRENCY =

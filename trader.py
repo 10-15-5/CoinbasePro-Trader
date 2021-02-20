@@ -97,13 +97,13 @@ def writetolog(dets):
 
 def sendmsg(order_details):
     try:
-        msg = f'{order_details["Product"]} - You got {order_details["filled_size"]} for ' \
+        msg = f'{order_details["product_id"]} - You got {order_details["filled_size"]} for ' \
               f'€{float(order_details["specified_funds"]): .2f}'
     except:
         msg = f'You bought some crypto but for some reason the messaging part of it fucked up!'
 
-    url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=" \
-          f"{settings.TELEGRAM_CHAT_ID}&text={msg}"
+    url = f"https://api.telegram.org/bot{config.get('CONFIG', 'TELEGRAM_BOT_TOKEN')}/sendMessage?chat_id=" \
+          f"{config.get('CONFIG', 'TELEGRAM_CHAT_ID')}&text={msg}"
 
     # send the msg
     requests.get(url)
@@ -127,9 +127,7 @@ def main():
         # Uses the order ID to get specific details of transaction
         dets = auth_client.get_order(order_ids[i])
         writetolog(dets)
-        telegram_details = {"Product": dets["product_id"], "Filled Size": dets["filled_size"],
-                            "Spent": ["specified_funds"]}
-        sendmsg(telegram_details)
+        sendmsg(dets)
 
 
 if __name__ == '__main__':
