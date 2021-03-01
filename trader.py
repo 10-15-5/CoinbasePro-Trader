@@ -54,9 +54,10 @@ def getcoins():
 
 def getpurchaseamount(coins):
     amount = []
-    print("How much do you want to spend? (Minimum amount per transaction is €10)")
+    currency = config.get("CONFIG", "CURRENCY")
+    print("How much do you want to spend? (Minimum amount per transaction is 10" + currency +  ")")
     for i in range(len(coins)):
-        spend = input(coins[i] + ":\t€")
+        spend = input(coins[i] + ":\t" + currency)
         try:
             spend = float(spend)
             amount.append(str(spend))
@@ -98,7 +99,7 @@ def writetolog(dets):
 def sendmsg(order_details):
     try:
         msg = f'{order_details["product_id"]} - You got {order_details["filled_size"]} for ' \
-              f'€{float(order_details["specified_funds"]): .2f}'
+              f'{config.get("CONFIG", "CURRENCY")}{float(order_details["specified_funds"]): .2f}'
     except:
         msg = f'You bought some crypto but for some reason the messaging part of it fucked up!'
 
