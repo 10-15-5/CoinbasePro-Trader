@@ -100,7 +100,7 @@ def sendmsg(order_details):
         msg = order_details["product_id"] + "- You got " + order_details["filled_size"] + " for " + \
               bought_rounded + config.get("CONFIG", "CURRENCY")
     except:
-        msg = f'You bought some crypto but for some reason the messaging part of it fucked up!'
+        msg = "You bought some crypto but for some reason the messaging part of it fucked up!"
 
     url = "https://api.telegram.org/bot" + config.get('CONFIG', 'TELEGRAM_BOT_TOKEN') + "/sendMessage?chat_id=" + \
           config.get('CONFIG', 'TELEGRAM_CHAT_ID') + "&text=" + msg
