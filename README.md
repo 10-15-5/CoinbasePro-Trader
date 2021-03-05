@@ -7,7 +7,7 @@ price.
 
 Uses the cbpro python client to interact with the Coinbase API.
 
-##Getting Started
+## Getting Started
 
 1) To set up the program go into settings/config and change the API codes, the Telegram codes, 
    and the Currency you want to use.
